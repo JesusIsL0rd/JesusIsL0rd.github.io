@@ -1,4 +1,5 @@
 @echo off
+:: SearchLibNet
 rmdir /Q /S dl
 cls
 
@@ -30,6 +31,7 @@ for /F "tokens=*" %%a in ('type %FileName%') do (
 	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.overdrive.com/_Ajax/get-libraries-for-media?mediaId=%bkid%&resultLimit=1&distance=1&position=%%a', 'dl\%%a.txt')"
 )
 endlocal
+
 :: This is for libraries that have no GPS location
 setlocal
 set filename=libn.txt
@@ -38,7 +40,6 @@ for /F "tokens=*" %%q in ('type %FileName%') do (
 )
 endlocal
 
-pause
 
 :: Delete Libraries with no results
 for %%j in (dl\*) do if %%~zj lss 25 del "%%~j"
@@ -66,7 +67,6 @@ call :cleanup
 pause
 exit
 
-
 :: If no book is found
 :noresults
 call :cleanup
@@ -75,7 +75,6 @@ echo Sorry, the book in question is not in any of my libraries...
 echo.
 pause
 exit
-
 
 :cleanup
 rmdir /Q /S dl
