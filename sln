@@ -55,7 +55,7 @@ goto noresults
 
 :: Echo's the found.txt file for easy viewing.
 :resultsfound
-echo ---------- %bkid% ---------- >> found.txt
+echo -------- %bkid% -------- >> found.txt
 for %%f in ("dl\*") do echo %%~nf >> found.txt
 cls
 echo These libraries have the book in question
