@@ -23,7 +23,12 @@ set /p bkid=Enter the book ID:
 call set this=%%bkid
 md tmp\dl
 cls
-echo Searching. This should take under a minute. Hang on.
+:: Counts the Libraries
+setlocal EnableDelayedExpansion
+set "cmd=findstr /R /N "^^" *.txt | find /C ":""
+for /f %%a in ('!cmd!') do set number=%%a
+echo Searching %number% Libraries. This should take under a minute. Please wait.
+endlocal
 
 ::Starts the library downloads. Uses lib.txt as its source
 
