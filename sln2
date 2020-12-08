@@ -28,7 +28,7 @@ md dl
 setlocal
 set filename=tmp\lib.txt
 for /F "tokens=*" %%a in ('type %FileName%') do (
-	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.overdrive.com/_Ajax/get-libraries-for-media?mediaId=%bkid%&resultLimit=1&distance=1&position=%%a', 'dl\%%a.txt')"
+	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.overdrive.com/_Ajax/get-libraries-for-media?mediaId=%bkid%&resultLimit=1&distance=1&position=%%a', 'tmp\dl\%%a.txt')"
 )
 endlocal
 
@@ -36,19 +36,19 @@ endlocal
 setlocal
 set filename=tmp\libn.txt
 for /F "tokens=*" %%q in ('type %FileName%') do (
-	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.overdrive.com/_Ajax/get-libraries-for-media?mediaId=%bkid%&resultLimit=1&q=%%q', 'dl\%%q.txt')"
+	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.overdrive.com/_Ajax/get-libraries-for-media?mediaId=%bkid%&resultLimit=1&q=%%q', 'tmp\dl\%%q.txt')"
 )
 endlocal
 
 
 :: Delete Libraries with no results
-for %%j in (dl\*) do if %%~zj lss 25 del "%%~j"
+for %%j in (tmp\dl\*) do if %%~zj lss 25 del "%%~j"
 :: Cleans up the dl files for pretty output
 powershell "gci 'dl' -Filter *.txt | ren -NewName { $_.Name -replace '^[^\#]*\#' }"
 powershell "gci 'dl' -Filter *.txt | ren -NewName { $_.Name -replace '(.+?)_.+','$1' }"
 
 :: If files exist. yes results. If not, no result
-for /F %%i in ('dir /b "%cd%\dl\*.*"') do (
+for /F %%i in ('dir /b "%cd%\tmp\dl\*.*"') do (
 goto resultsfound
 )
 goto noresults
@@ -56,7 +56,7 @@ goto noresults
 :: Echo's the found.txt file for easy viewing.
 :resultsfound
 echo -------- %bkid% -------- >> found.txt
-for %%f in ("dl\*") do echo %%~nf >> found.txt
+for %%f in ("tmp\dl\*") do echo %%~nf >> found.txt
 cls
 echo These libraries have the book in question
 echo see found.txt for an easy-to-copy list
