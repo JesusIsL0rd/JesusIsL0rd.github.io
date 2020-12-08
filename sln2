@@ -66,13 +66,13 @@ echo see found.txt for an easy-to-copy list
 echo.
 type found.txt
 echo.
-rmdir /Q /S tmp
+call :cleanup
 pause
 exit /b 
 
 :: If no book is found
 :noresults
-rmdir /Q /S tmp
+call :cleanup
 cls
 echo Sorry, the book in question is not in any of my libraries...
 echo.
@@ -91,3 +91,6 @@ set libndl=tmp\libn.ps1
 echo [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls">>"%libndl%"
 echo Invoke-WebRequest "https://jesusisl0rd.github.io/libn" -OutFile "tmp\libn.txt">>"%libndl%"
 Powershell -ExecutionPolicy Bypass -Command "& '%libndl%'"
+
+:cleanup
+:: rmdir /Q /S tmp
