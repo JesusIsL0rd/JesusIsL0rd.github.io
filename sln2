@@ -61,13 +61,13 @@ echo see found.txt for an easy-to-copy list
 echo.
 type found.txt
 echo.
-call :cleanup
+:: call :cleanup
 pause
 exit /b 
 
 :: If no book is found
 :noresults
-call :cleanup
+:: call :cleanup
 cls
 echo Sorry, the book in question is not in any of my libraries...
 echo.
