@@ -65,7 +65,7 @@ type found.txt
 echo.
 call :cleanup
 pause
-exit
+
 
 :: If no book is found
 :noresults
@@ -74,7 +74,7 @@ cls
 echo Sorry, the book in question is not in any of my libraries...
 echo.
 pause
-exit
+
 
 :cleanup
 rmdir /Q /S dl
