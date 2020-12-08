@@ -1,11 +1,12 @@
 @echo off
 :: SearchLibNet
-rmdir /Q /S dl
-cls
 
 ::Downloads/Creates the library files
 powershell -Command "(New-Object Net.WebClient).DownloadFile('https://jesusisl0rd.github.io/lib', 'tmp\lib.txt')"
 powershell -Command "(New-Object Net.WebClient).DownloadFile('https://jesusisl0rd.github.io/libn', 'tmp\libn.txt')"
+
+::Calls the backup download method if the main one errors. Github has SSL errors sometimes
+=if not exist "tmp\libn.txt" call :downloadbak
 
 :: Sets the Book ID
 echo SearchLibNet
@@ -20,22 +21,19 @@ echo.
 set bkid=error
 set /p bkid=Enter the book ID:
 call set this=%%bkid
+md tmp\dl
 cls
 echo Searching. This should take under a minute. Hang on.
 
 ::Starts the library downloads. Uses lib.txt as its source
-md dl
+
 setlocal
-set filename=tmp\lib.txt
-for /F "tokens=*" %%a in ('type %FileName%') do (
+set lib=tmp\lib.txt
+set libn=tmp\libn.txt
+for /F "tokens=*" %%a in ('type %lib%') do (
 	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.overdrive.com/_Ajax/get-libraries-for-media?mediaId=%bkid%&resultLimit=1&distance=1&position=%%a', 'tmp\dl\%%a.txt')"
 )
-endlocal
-
-:: This is for libraries that have no GPS location
-setlocal
-set filename=tmp\libn.txt
-for /F "tokens=*" %%q in ('type %FileName%') do (
+for /F "tokens=*" %%q in ('type %libn%') do (
 	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.overdrive.com/_Ajax/get-libraries-for-media?mediaId=%bkid%&resultLimit=1&q=%%q', 'tmp\dl\%%q.txt')"
 )
 endlocal
@@ -44,8 +42,8 @@ endlocal
 :: Delete Libraries with no results
 for %%j in (tmp\dl\*) do if %%~zj lss 25 del "%%~j"
 :: Cleans up the dl files for pretty output
-powershell "gci 'dl' -Filter *.txt | ren -NewName { $_.Name -replace '^[^\#]*\#' }"
-powershell "gci 'dl' -Filter *.txt | ren -NewName { $_.Name -replace '(.+?)_.+','$1' }"
+powershell "gci 'tmp\dl' -Filter *.txt | ren -NewName { $_.Name -replace '^[^\#]*\#' }"
+powershell "gci 'tmp\dl' -Filter *.txt | ren -NewName { $_.Name -replace '(.+?)_.+','$1' }"
 
 :: If files exist. yes results. If not, no result
 for /F %%i in ('dir /b "%cd%\tmp\dl\*.*"') do (
@@ -65,7 +63,7 @@ type found.txt
 echo.
 call :cleanup
 pause
-
+exit /b 
 
 :: If no book is found
 :noresults
@@ -74,8 +72,19 @@ cls
 echo Sorry, the book in question is not in any of my libraries...
 echo.
 pause
-
+exit /b 
 
 :cleanup
-rmdir /Q /S dl
-del /S /Q lib.txt libn.txt >nul
+rmdir /Q /S tmp
+
+:: This is if your SSL is having issues. Should not be needed
+:downloadbak
+set libdl=tmp\lib.ps1
+echo [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls">>"%libdl%"
+echo Invoke-WebRequest "https://jesusisl0rd.github.io/lib" -OutFile "tmp\lib.txt">>"%libdl%"
+Powershell -ExecutionPolicy Bypass -Command "& '%libdl%'"
+
+set libndl=tmp\libn.ps1
+echo [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls">>"%libndl%"
+echo Invoke-WebRequest "https://jesusisl0rd.github.io/libn" -OutFile "tmp\libn.txt">>"%libndl%"
+Powershell -ExecutionPolicy Bypass -Command "& '%libndl%'"
