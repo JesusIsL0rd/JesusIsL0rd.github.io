@@ -1,0 +1,10 @@
+echo off
+cls
+echo.
+echo.
+echo.
+echo your version of SLN is out-dated. Please update.
+echo.
+echo.
+echo.
+pause
