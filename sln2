@@ -25,7 +25,7 @@ md tmp\dl
 cls
 :: Counts the Libraries
 setlocal EnableDelayedExpansion
-set "cmd=findstr /R /N "^^" lib.txt | find /C ":""
+set "cmd=findstr /R /N "^^" tmp\*.txt | find /C ":""
 for /f %%a in ('!cmd!') do set number=%%a
 echo Searching %number% Libraries. This should take under a minute. Please wait.
 endlocal
