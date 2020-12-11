@@ -6,7 +6,7 @@ powershell -Command "(New-Object Net.WebClient).DownloadFile('https://jesusisl0r
 powershell -Command "(New-Object Net.WebClient).DownloadFile('https://jesusisl0rd.github.io/libn', 'tmp\libn.txt')"
 
 ::Calls the backup download method if the main one errors. Github has SSL errors sometimes
-=if not exist "tmp\libn.txt" call :downloadbak
+=if not exist "tmp\lib.txt" call :downloadbak
 
 :: Sets the Book ID
 echo SearchLibNet - Link-ified Update
