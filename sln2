@@ -63,14 +63,12 @@ for %%f in ("tmp\dl\*") do echo https://%%~nf.overdrive.com/media/%bkid% >> foun
 cls
 :: Counts the Libraries
 setlocal EnableDelayedExpansion
-set "cmd=findstr /R /N "^^" tmp\*.txt | find /C ":""
+set "cmd=findstr /R /N "^^" found.txt | find /C ":""
 for /f %%a in ('!cmd!') do set number=%%a
-echo Looks like %number% Libraries have the book you're looking for
+echo Looks like %number% Libraries had the book you were searching for
 endlocal
-echo 
-echo see found.txt for which libraries and the links to the books
 echo.
-type found.txt
+echo see found.txt for which libraries and the links to the books
 echo.
 pause
 exit /b 
