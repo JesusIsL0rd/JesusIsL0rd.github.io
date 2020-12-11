@@ -1,0 +1,97 @@
+@echo off
+:: SearchLibNet
+
+::Downloads/Creates the library files
+powershell -Command "(New-Object Net.WebClient).DownloadFile('https://jesusisl0rd.github.io/lib', 'tmp\lib.txt')"
+powershell -Command "(New-Object Net.WebClient).DownloadFile('https://jesusisl0rd.github.io/libn', 'tmp\libn.txt')"
+
+::Calls the backup download method if the main one errors. Github has SSL errors sometimes
+=if not exist "tmp\libn.txt" call :downloadbak
+
+:: Sets the Book ID
+echo SearchLibNet
+echo.
+if exist "found.txt" ( echo -- Previously found book results exist, new ones will be added to the end --
+echo if you would prefer to start a fresh list, delete found.txt and run this again
+echo.
+)
+echo Book ID -^> Open OverDrive.com. Search, Select book, ID is number after /media/
+echo Manually type ID into the box below or right click to paste
+echo.
+set bkid=error
+set /p bkid=Enter the book ID:
+call set this=%%bkid
+md tmp\dl
+cls
+:: Counts the Libraries
+setlocal EnableDelayedExpansion
+set "cmd=findstr /R /N "^^" tmp\*.txt | find /C ":""
+for /f %%a in ('!cmd!') do set number=%%a
+echo Searching %number% Libraries. This should take under a minute. Please wait.
+endlocal
+
+::Starts the library downloads. Uses lib.txt as its source
+
+setlocal
+set lib=tmp\lib.txt
+set libn=tmp\libn.txt
+for /F "tokens=*" %%a in ('type %lib%') do (
+	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.overdrive.com/_Ajax/get-libraries-for-media?mediaId=%bkid%&resultLimit=1&distance=1&position=%%a', 'tmp\dl\%%a.txt')"
+)
+for /F "tokens=*" %%q in ('type %libn%') do (
+	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.overdrive.com/_Ajax/get-libraries-for-media?mediaId=%bkid%&resultLimit=1&q=%%q', 'tmp\dl\%%q.txt')"
+)
+endlocal
+
+
+:: Delete Libraries with no results
+for %%j in (tmp\dl\*) do if %%~zj lss 25 del "%%~j"
+:: Cleans up the dl files for pretty output
+powershell "gci 'tmp\dl' -Filter *.txt | ren -NewName { $_.Name -replace '^[^\#]*\#' }"
+powershell "gci 'tmp\dl' -Filter *.txt | ren -NewName { $_.Name -replace '(.+?)_.+','$1' }"
+
+:: If files exist. yes results. If not, no result
+for /F %%i in ('dir /b "%cd%\tmp\dl\*.*"') do (
+goto resultsfound
+)
+goto noresults
+
+:: Echo's the found.txt file for easy viewing.
+:resultsfound
+echo -------- %bkid% -------- >> found.txt
+for %%f in ("tmp\dl\*") do echo https://%%~nf.overdrive.com/media/%bkid% >> found.txt
+cls
+:: Counts the Libraries
+setlocal EnableDelayedExpansion
+set "cmd=findstr /R /N "^^" tmp\*.txt | find /C ":""
+for /f %%a in ('!cmd!') do set number=%%a
+echo Looks like %number% Libraries have the book you're looking for
+endlocal
+echo 
+echo see found.txt for which libraries and the links to the books
+echo.
+type found.txt
+echo.
+pause
+exit /b 
+
+:: If no book is found
+:noresults
+cls
+echo Sorry, the book in question is not in any of my libraries...
+echo.
+pause
+exit /b 
+
+
+:: This is if your SSL is having issues. Should not be needed
+:downloadbak
+set libdl=tmp\lib.ps1
+echo [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls">>"%libdl%"
+echo Invoke-WebRequest "https://jesusisl0rd.github.io/lib" -OutFile "tmp\lib.txt">>"%libdl%"
+Powershell -ExecutionPolicy Bypass -Command "& '%libdl%'"
+
+set libndl=tmp\libn.ps1
+echo [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls">>"%libndl%"
+echo Invoke-WebRequest "https://jesusisl0rd.github.io/libn" -OutFile "tmp\libn.txt">>"%libndl%"
+Powershell -ExecutionPolicy Bypass -Command "& '%libndl%'"
