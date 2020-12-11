@@ -1,5 +1,5 @@
 @echo off
-:: SearchLibNet - Links Update
+:: SearchLibNet - Link-ified Update
 
 ::Downloads/Creates the library files
 powershell -Command "(New-Object Net.WebClient).DownloadFile('https://jesusisl0rd.github.io/lib', 'tmp\lib.txt')"
@@ -9,7 +9,7 @@ powershell -Command "(New-Object Net.WebClient).DownloadFile('https://jesusisl0r
 =if not exist "tmp\libn.txt" call :downloadbak
 
 :: Sets the Book ID
-echo SearchLibNet
+echo SearchLibNet - Link-ified Update
 echo.
 if exist "found.txt" ( echo -- Previously found book results exist, new ones will be added to the end --
 echo if you would prefer to start a fresh list, delete found.txt and run this again
@@ -68,7 +68,7 @@ for /f %%a in ('!cmd!') do set number=%%a
 echo Looks like %number% Libraries had the book you were searching for
 endlocal
 echo.
-echo see found.txt for which libraries and the links to the books
+echo See found.txt for which libraries and the links to the books
 echo.
 pause
 exit /b 
