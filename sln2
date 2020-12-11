@@ -1,5 +1,5 @@
 @echo off
-:: SearchLibNet
+:: SearchLibNet - Links Update
 
 ::Downloads/Creates the library files
 powershell -Command "(New-Object Net.WebClient).DownloadFile('https://jesusisl0rd.github.io/lib', 'tmp\lib.txt')"
