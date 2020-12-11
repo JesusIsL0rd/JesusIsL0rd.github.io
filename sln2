@@ -68,7 +68,7 @@ for /f %%a in ('!cmd!') do set number=%%a
 echo Looks like %number% Libraries had the book you were searching for
 endlocal
 echo.
-echo See found.txt for which libraries and the links to the books
+echo See found.txt for the names of and links to, the libraries
 echo.
 pause
 exit /b 
