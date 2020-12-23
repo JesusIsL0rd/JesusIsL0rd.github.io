@@ -208,7 +208,8 @@ function displayData(data){
             //jsonData[i].push(`<a href="https://${result.name}.overdrive.com/media/${info.id}">${info.name}</a>`)
         }
         
-        const myUrl = new URL(window.location.protocol + "//" + location.host.split(":")[0]);
+        const myUrl = new URL(window.location.href);
+        myUrl.searchParams.delete("data")
         myUrl.searchParams.append("data", data);
 
         document.getElementById("response").innerHTML = `Found "${info.name}" at ${jsonData.length} locations`
@@ -343,9 +344,9 @@ async function searchBooks(){
         }else{
 
             allLocations.push({name:bookName,id:book})
-            console.log(window.location)
-            const myUrl = new URL(window.location.protocol + "//" + location.host.split(":")[0]);
+            const myUrl = new URL(window.location.href);
             let compressed = await libJson.compress(JSON.stringify(allLocations))
+            myUrl.searchParams.delete("data")
             myUrl.searchParams.append("data", compressed);
             document.getElementById("urlBox").style.display = "block";
             document.getElementById("urlArea").value = myUrl.href
