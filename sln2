@@ -1,4 +1,22 @@
 @echo off
+
+echo off
+cls
+echo.
+echo.
+echo.
+echo A brand new online only version of SLN has been released
+echo it's 100x faster and is easier to use and share.
+echo JesusIsL0rd.github.io/"
+echo.
+echo.
+echo Press any key to open the new version. Bookmark it if you want.
+echo.
+pause
+start "" "https://jesusisl0rd.github.io/"
+exit
+
+
 :: SearchLibNet - Link-ified Update
 
 ::Downloads/Creates the library files
