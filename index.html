@@ -343,8 +343,8 @@ async function searchBooks(){
         }else{
 
             allLocations.push({name:bookName,id:book})
-
-            const myUrl = new URL(window.location.href);
+            console.log(window.location)
+            const myUrl = new URL(window.location.protocol + "//" + location.host.split(":")[0]);
             let compressed = await libJson.compress(JSON.stringify(allLocations))
             myUrl.searchParams.append("data", compressed);
             document.getElementById("urlBox").style.display = "block";
