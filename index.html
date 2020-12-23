@@ -208,7 +208,7 @@ function displayData(data){
             //jsonData[i].push(`<a href="https://${result.name}.overdrive.com/media/${info.id}">${info.name}</a>`)
         }
         
-        const myUrl = new URL(window.location.href);
+        const myUrl = new URL(window.location.protocol + "//" + location.host.split(":")[0]);
         myUrl.searchParams.append("data", data);
 
         document.getElementById("response").innerHTML = `Found "${info.name}" at ${jsonData.length} locations`
