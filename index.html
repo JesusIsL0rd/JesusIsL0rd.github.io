@@ -340,7 +340,7 @@ async function searchBooks(){
             allLocations.push({name:bookName,id:book})
 
             const myUrl = new URL(document.location.protocol +"//"+ document.location.hostname + document.location.pathname);
-            myUrl.searchParams.append("name", bookName);
+            myUrl.hash = bookName
             myUrl.searchParams.append("id", book);
             
             window.history.replaceState(null, null, myUrl.href);
