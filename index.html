@@ -125,8 +125,6 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"crossorigin="anonymous">
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
-<script src="https://gitcdn.link/repo/masotime/json-url/master/dist/browser/json-url.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" crossorigin="anonymous" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
@@ -205,30 +203,21 @@
 </style>
 
 <script>
-const libJson = JsonUrl('lzma');
 let foundURL = null
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(window.location.search);
-const data = urlParams.get('data')
+const bookID = urlParams.get('id')
 
-function displayData(data){
-    libJson.decompress(data).then((decompressed)=>{
-        let jsonData = JSON.parse(decompressed)
+if(bookID) {
+    document.getElementById("bookID").value = bookID
+    searchBooks()
+}
+function displayData(jsonData){
         let info = jsonData.pop()
         for (let i = 0; i < jsonData.length; i++) {
             let result = Locations.find(obj => {return obj.id === jsonData[i][0]})   
             jsonData[i][0] = `<a href="https://${result.name}.overdrive.com/media/${info.id}">${result.name}</a>`
-            //jsonData[i].push(`<a href="https://${result.name}.overdrive.com/media/${info.id}">${info.name}</a>`)
         }
-        
-        const myUrl = new URL(window.location.href);
-        myUrl.searchParams.delete("data")
-        myUrl.searchParams.append("data", data);
-
-        document.getElementById("response").innerHTML = `Found "${info.name}" at ${jsonData.length} locations`
-        document.getElementById("urlBox").style.display = "block";
-        document.getElementById("urlArea").value = myUrl.href
-        document.getElementById("bookID").value = info.id
 
         let table = $('#bookSearch').DataTable( {
             destroy: true,
@@ -248,48 +237,41 @@ function displayData(data){
             ]
         });
         new $.fn.dataTable.FixedColumns( table );
-    })
 }
 
-if(data){ 
-    document.getElementById("Display").style.display = "block";
-    displayData(data)
-}
+
+
 
 function copyToClip() {
-
-
     var copy = function(elementId) {
-    var input = document.getElementById(elementId);
-    var isiOSDevice = navigator.userAgent.match(/ipad|iphone/i);
+        var input = document.getElementById(elementId);
+        var isiOSDevice = navigator.userAgent.match(/ipad|iphone/i);
 
-    if (isiOSDevice) {
-    
-        var editable = input.contentEditable;
-        var readOnly = input.readOnly;
+        if (isiOSDevice) {
+        
+            var editable = input.contentEditable;
+            var readOnly = input.readOnly;
 
-        input.contentEditable = true;
-        input.readOnly = false;
+            input.contentEditable = true;
+            input.readOnly = false;
 
-        var range = document.createRange();
-        range.selectNodeContents(input);
+            var range = document.createRange();
+            range.selectNodeContents(input);
 
-        var selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
+            var selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
 
-        input.setSelectionRange(0, 999999);
-        input.contentEditable = editable;
-        input.readOnly = readOnly;
+            input.setSelectionRange(0, 999999);
+            input.contentEditable = editable;
+            input.readOnly = readOnly;
 
-    } else {
-        input.select();
+        } else {
+            input.select();
+        }
+
+        document.execCommand('copy');
     }
-
-document.execCommand('copy');
-}
-
-
     copy("urlArea")
 
     toastr.options = {
@@ -305,7 +287,7 @@ document.execCommand('copy');
 }
 
 async function searchBooks(){
-    window.history.replaceState(null, null, window.location.pathname);
+   
     document.getElementById("urlBox").style.display = "none";
     document.getElementById("Display").style.display = "none";
     let book = document.getElementById("bookID").value;
@@ -347,31 +329,32 @@ async function searchBooks(){
         allLocations.push(data)
     }
     
-    
-    //window.history.pushState("", "", window.location.href);
-   
+       
     if(bookName){
 
         if(!allLocations.length){
+            window.history.replaceState(null, null, window.location.pathname);
             document.getElementById("response").innerHTML = `Book: "${bookName}" wasn't found at any location.`
         }else{
 
             allLocations.push({name:bookName,id:book})
-            const myUrl = new URL(window.location.href);
-            let compressed = await libJson.compress(JSON.stringify(allLocations))
-            myUrl.searchParams.delete("data")
-            myUrl.searchParams.append("data", compressed);
-            document.getElementById("urlBox").style.display = "block";
-            document.getElementById("urlArea").value = myUrl.href
-            document.getElementById("response").innerHTML = `Found "${bookName}" at ${allLocations.length-1} locations`
-            //window.history.pushState("", "", myUrl.href);
-            window.history.replaceState(null, null, myUrl.href);
 
+            const myUrl = new URL(document.location.protocol +"//"+ document.location.hostname + document.location.pathname);
+            myUrl.searchParams.append("name", bookName);
+            myUrl.searchParams.append("id", book);
+            
+            window.history.replaceState(null, null, myUrl.href);
+            
+            document.getElementById("urlArea").value = myUrl.href
+            document.getElementById("urlBox").style.display = "block";
+            document.getElementById("response").innerHTML = `Found "${bookName}" at ${allLocations.length-1} locations`            
+            
             document.getElementById("Display").style.display = "block";
-            displayData(compressed)
+            displayData(allLocations)
             
         }
     }else{
+        window.history.replaceState(null, null, window.location.pathname);
         document.getElementById("response").innerHTML = `Book: ${book} not found.`
     }
     
