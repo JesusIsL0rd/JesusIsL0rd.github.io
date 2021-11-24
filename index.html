@@ -303,7 +303,7 @@ async function searchBooks(){
     let allPromises = []
     for (const location of Locations) {
         const url = new URL(`https://${location.name}.overdrive.com/media/info/${book}`);
-        const proxy = "https://cors.corsb4.workers.dev?"
+        const proxy = "https://worker.multitools.xyz?"
         async function getAxios(url,location){
             try {
                 return {resp:await axios.get(url), id:location.id, name:location.name, book} 
